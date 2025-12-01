@@ -1,0 +1,21 @@
+name = "aoc-webhook"
+main = "src/index.ts"
+compatibility_date = "2025-12-01"
+
+# KV namespace for storing leaderboard state
+kv_namespaces = [
+  { binding = "AOC_STATE", id = "YOUR_KV_NAMESPACE_ID", preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID" }
+]
+
+# Cron triggers
+# Every 20 minutes for checking updates
+[triggers]
+crons = [
+  "*/20 * * * *",      # Every 20 minutes - check for completions
+  "0 18 * 12 *"        # Daily at 18:00 UTC (19:00 UTC+1) in December - send full leaderboard
+]
+
+# Environment variables (set these with wrangler secret put)
+# AOC_SESSION_COOKIE - Your Advent of Code session cookie
+# AOC_LEADERBOARD_ID - Your private leaderboard ID
+# GOOGLE_CHAT_WEBHOOK_URL - Your Google Chat webhook URL
