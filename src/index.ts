@@ -71,13 +71,105 @@ export default {
       }
     }
 
-    return new Response(
-      "AoC Webhook Worker\n\nEndpoints:\n  /check - Manual completion check\n  /daily - Send daily leaderboard\n  /reset - Reset stored state",
-      {
-        status: 200,
-        headers: { "Content-Type": "text/plain" },
+    if (url.pathname === "/reset-rate-limit") {
+      try {
+        await env.AOC_STATE.delete("last_api_fetch");
+        return new Response("Rate limit reset (use for testing only!)", {
+          status: 200,
+        });
+      } catch (error) {
+        return new Response(`Error: ${error}`, { status: 500 });
       }
-    );
+    }
+
+    // Test endpoints that preview messages without sending
+    if (url.pathname === "/preview-daily") {
+      try {
+        const leaderboard = await fetchLeaderboard(env);
+        const message = formatDailyLeaderboard(leaderboard);
+        return new Response(message, {
+          status: 200,
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        });
+      } catch (error) {
+        return new Response(`Error: ${error}`, { status: 500 });
+      }
+    }
+
+    if (url.pathname === "/preview-completions") {
+      try {
+        const leaderboard = await fetchLeaderboard(env);
+        const currentCompletions = extractCompletions(leaderboard);
+        const previousState = await getStoredState(env);
+
+        if (!previousState) {
+          return new Response(
+            "No previous state. Run /check first to initialize.",
+            {
+              status: 200,
+            }
+          );
+        }
+
+        const newCompletions = findNewCompletions(
+          currentCompletions,
+          previousState.completions
+        );
+
+        if (newCompletions.length === 0) {
+          return new Response("No new completions since last check.", {
+            status: 200,
+          });
+        }
+
+        const message = formatCompletionMessage(newCompletions);
+        return new Response(message, {
+          status: 200,
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        });
+      } catch (error) {
+        return new Response(`Error: ${error}`, { status: 500 });
+      }
+    }
+
+    // Status endpoint
+    if (url.pathname === "/status" || url.pathname === "/") {
+      try {
+        const lastFetch = await env.AOC_STATE.get("last_api_fetch");
+        let statusMsg = "AoC Webhook Worker\n\n";
+
+        if (lastFetch) {
+          const timeSince = Date.now() - parseInt(lastFetch);
+          const minutesAgo = Math.floor(timeSince / 60000);
+          const canFetchIn = Math.max(0, 15 - minutesAgo);
+
+          statusMsg += `Last API fetch: ${minutesAgo} minute(s) ago\n`;
+          statusMsg += `Can fetch again in: ${canFetchIn} minute(s)\n\n`;
+        } else {
+          statusMsg += "No API fetches yet\n\n";
+        }
+
+        statusMsg += "Endpoints:\n";
+        statusMsg += "  /check - Manual completion check\n";
+        statusMsg += "  /daily - Send daily leaderboard\n";
+        statusMsg += "  /reset - Reset stored state\n";
+        statusMsg += "  /status - View rate limit status\n\n";
+        statusMsg += "Test Endpoints (preview without sending):\n";
+        statusMsg += "  /preview-daily - Preview daily leaderboard\n";
+        statusMsg +=
+          "  /preview-completions - Preview completion notifications\n\n";
+        statusMsg += "Note: AoC API has 15-minute minimum between requests";
+
+        return new Response(statusMsg, {
+          status: 200,
+          headers: { "Content-Type": "text/plain" },
+        });
+      } catch (error) {
+        return new Response(`Error: ${error}`, { status: 500 });
+      }
+    }
+
+    return new Response("Not found", { status: 404 });
   },
 };
 

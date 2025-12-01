@@ -28,8 +28,10 @@ export function formatCompletionMessage(
     });
 
     for (const completion of memberCompletions) {
-      const stars = "⭐".repeat(completion.part);
-      message += `  • Day ${completion.day} Part ${completion.part} ${stars}\n`;
+      // Check if this is completing part 2 (gold star) or part 1 (silver star)
+      const starType =
+        completion.part === 2 ? "🥇 Gold Star" : "🥈 Silver Star";
+      message += `  • Day ${completion.day} - ${starType}\n`;
     }
     message += "\n";
   }
@@ -76,21 +78,21 @@ export function formatDailyLeaderboard(leaderboard: LeaderboardData): string {
 }
 
 function formatProgress(member: Member): string {
-  const days = 25;
+  const days = 12; // 2025 has 12 days instead of 25
   let progress = "";
 
   for (let day = 1; day <= days; day++) {
     const dayData = member.completion_day_level[day.toString()];
     if (!dayData) {
-      progress += "⬜";
+      progress += "⬜"; // Gray - no stars
     } else if (dayData["2"]) {
-      progress += "⭐";
+      progress += "🥇"; // Gold - both stars
     } else if (dayData["1"]) {
-      progress += "🌟";
+      progress += "🥈"; // Silver - first star only
     }
 
-    // Add space every 5 days for readability
-    if (day % 5 === 0 && day < days) {
+    // Add space every 4 days for readability (since we have 12 days)
+    if (day % 4 === 0 && day < days) {
       progress += " ";
     }
   }
