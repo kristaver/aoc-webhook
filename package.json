@@ -8,12 +8,17 @@
     "deploy": "wrangler deploy",
     "tail": "wrangler tail"
   },
-  "keywords": ["cloudflare-workers", "advent-of-code", "google-chat", "webhook"],
+  "keywords": [
+    "cloudflare-workers",
+    "advent-of-code",
+    "google-chat",
+    "webhook"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
     "typescript": "^5.7.2",
-    "wrangler": "^3.87.0"
+    "wrangler": "^4.51.0"
   }
 }

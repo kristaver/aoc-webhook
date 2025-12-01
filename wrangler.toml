@@ -4,7 +4,7 @@ compatibility_date = "2025-12-01"
 
 # KV namespace for storing leaderboard state
 kv_namespaces = [
-  { binding = "AOC_STATE", id = "YOUR_KV_NAMESPACE_ID", preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID" }
+  { binding = "AOC_STATE", id = "659fa8e2e6f74122abd49853213c522c", preview_id = "eb406634336f40d48d75d4c75de24bd6" }
 ]
 
 # Cron triggers
