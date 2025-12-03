@@ -20,9 +20,10 @@ export default {
   ): Promise<void> {
     const cronTime = new Date(event.scheduledTime);
     const hour = cronTime.getUTCHours();
+    const minute = cronTime.getUTCMinutes();
 
     // Check if this is the daily leaderboard cron (18:00 UTC = 19:00 UTC+1)
-    const isDailyLeaderboard = hour === 18 && cronTime.getUTCMinutes() === 0;
+    const isDailyLeaderboard = hour === 18 && minute === 0;
 
     try {
       if (isDailyLeaderboard) {
