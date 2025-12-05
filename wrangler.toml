@@ -10,8 +10,8 @@ kv_namespaces = [
 # Cron triggers
 [triggers]
 crons = [
-  "19,39,59 * * * *",  # At :19, :39, :59 each hour - check for completions (avoids 18:00 collision)
-  "0 18 * 12 *"        # Daily at 18:00 UTC (19:00 UTC+1) in December - send full leaderboard
+  "5,25,45 * * * *",   # At :05, :25, :45 each hour - check for completions
+  "0 18 * 12 *"        # Daily at 18:00 UTC (19:00 UTC+1) in December - send full leaderboard (15min after 17:45)
 ]
 
 # Environment variables (set these with wrangler secret put)
